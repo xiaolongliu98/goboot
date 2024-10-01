@@ -29,6 +29,28 @@ func getPtrStructName(o any) string {
 	return reflect.TypeOf(o).Elem().Name()
 }
 
+func isEmbedded(structType interface{}, embeddedType interface{}) bool {
+	st := reflect.TypeOf(structType)
+	et := reflect.TypeOf(embeddedType)
+	if et.Kind() == reflect.Ptr {
+		et = et.Elem()
+	}
+	if st.Kind() == reflect.Ptr {
+		st = st.Elem()
+	}
+
+	// 遍历 struct 的所有字段
+	for i := 0; i < st.NumField(); i++ {
+		field := st.Field(i)
+
+		// 判断是否是嵌入字段，并且类型匹配
+		if field.Anonymous && field.Type == et {
+			return true
+		}
+	}
+	return false
+}
+
 func foreachSubComponent(component Component, f func(fieldComponent Component, filedIndex int, autowiredName string)) {
 	// 递归初始化instance依赖的Component（tag标记autowired:""）
 	// 遍历instance的字段，如果字段是Component类型，且tag标记autowired:""，则初始化

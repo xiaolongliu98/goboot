@@ -5,7 +5,12 @@ import (
 	"github.com/xiaolongliu98/goboot/booter"
 	"github.com/xiaolongliu98/goboot/boottest/handler"
 	"github.com/xiaolongliu98/goboot/boottest/service"
+	"reflect"
 )
+
+type TestHandler2 struct {
+	booter.HandlerComponent
+}
 
 func main() {
 	booter.Register((*handler.TestHandler)(nil))
@@ -26,4 +31,34 @@ func main() {
 	fmt.Println(svc2)
 
 	booter.CleanupAll()
+
+	handler2 := &TestHandler2{}
+	_, ok := interface{}(handler2).(booter.HandlerComponent)
+	fmt.Println(ok)
+	ok = isEmbedded(handler2, &booter.HandlerComponent{})
+	fmt.Println(ok)
+	ok = isEmbedded(handler2, &booter.ServiceComponent{})
+	fmt.Println(ok)
+}
+
+func isEmbedded(structType interface{}, embeddedType interface{}) bool {
+	st := reflect.TypeOf(structType)
+	et := reflect.TypeOf(embeddedType)
+	if et.Kind() == reflect.Ptr {
+		et = et.Elem()
+	}
+	if st.Kind() == reflect.Ptr {
+		st = st.Elem()
+	}
+
+	// 遍历 struct 的所有字段
+	for i := 0; i < st.NumField(); i++ {
+		field := st.Field(i)
+
+		// 判断是否是嵌入字段，并且类型匹配
+		if field.Anonymous && field.Type == et {
+			return true
+		}
+	}
+	return false
 }

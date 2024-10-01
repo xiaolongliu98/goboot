@@ -69,7 +69,16 @@ func (c *Container) ExistInstance(target Component) bool {
 	return false
 }
 
-// ForeachInstance
+// GetParentInstance 获取instance的parent
+func (c *Container) GetParentInstance(instance Component) Component {
+	for parent, child := range c.Instances {
+		if child == instance {
+			return parent
+		}
+	}
+	return nil
+}
+
 func (c *Container) ForeachInstance(fn func(instance Component)) {
 	for _, instance := range c.Instances {
 		fn(instance)

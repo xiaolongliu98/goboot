@@ -216,6 +216,49 @@ func (ctx *BootContext) ExistInstance(target Component) bool {
 	return container.ExistInstance(target)
 }
 
+func (ctx *BootContext) GetTypeComponents(t any) []Component {
+	ctx.lock.RLock()
+	defer ctx.lock.RUnlock()
+
+	var res []Component
+	for _, component := range ctx.components {
+		if isEmbedded(component, t) {
+			res = append(res, component)
+		}
+	}
+	return res
+}
+
+// GetTypeInstances 获取嵌入了指定类型的所有实例
+// t: 指定的嵌入类型，如booter.HandlerComponent，也可以是自定义的接口类型
+func (ctx *BootContext) GetTypeInstances(t any) []Component {
+	ctx.lock.RLock()
+	defer ctx.lock.RUnlock()
+
+	var res []Component
+	for _, instanceContainer := range ctx.container {
+		instanceContainer.ForeachInstance(func(instance Component) {
+			if isEmbedded(instance, t) {
+				res = append(res, instance)
+			}
+		})
+	}
+	return res
+}
+
+// GetParentInstance 获取父实例
+func (ctx *BootContext) GetParentInstance(instance Component) Component {
+	ctx.lock.RLock()
+	defer ctx.lock.RUnlock()
+
+	name := ctx.getComponentName(instance)
+	container, exists := ctx.container[name]
+	if !exists {
+		return nil
+	}
+	return container.GetParentInstance(instance)
+}
+
 func (ctx *BootContext) CleanupAll() {
 	ctx.lock.Lock()
 	defer ctx.lock.Unlock()

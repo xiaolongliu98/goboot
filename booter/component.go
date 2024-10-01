@@ -14,3 +14,10 @@ type ComponentConfigurable interface {
 type ComponentCleaner interface {
 	ComponentCleanup(ctx *BootContext) error
 }
+
+type HandlerComponent struct {
+}
+type ServiceComponent struct {
+}
+type DAOComponent struct {
+}
