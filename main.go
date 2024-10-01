@@ -25,4 +25,5 @@ func main() {
 	fmt.Println(svc1)
 	fmt.Println(svc2)
 
+	booter.CleanupAll()
 }

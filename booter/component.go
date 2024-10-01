@@ -10,3 +10,7 @@ type ComponentInitializer interface {
 type ComponentConfigurable interface {
 	ComponentConfig(ctx *BootContext) *ComponentConfig
 }
+
+type ComponentCleaner interface {
+	ComponentCleanup(ctx *BootContext) error
+}

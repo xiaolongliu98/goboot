@@ -10,6 +10,10 @@ type TestService2 struct {
 	TestService1 *TestService1 `autowired:""`
 }
 
+func (s *TestService2) ComponentConfig(ctx *booter.BootContext) *booter.ComponentConfig {
+	return booter.DefaultConfig(booter.WithSingleton(false))
+}
+
 func (s *TestService2) Initialize(ctx *booter.BootContext) error {
 	fmt.Println("TestService2 NewComponent")
 	return nil

@@ -5,6 +5,10 @@ import (
 	"github.com/xiaolongliu98/goboot/booter"
 )
 
+type StringGetter interface {
+	GetString() string
+}
+
 type TestService1 struct {
 	Msg          string
 	TestService2 *TestService2 `autowired:""`

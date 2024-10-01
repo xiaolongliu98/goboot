@@ -28,3 +28,34 @@ func newPointerInstance[T any](o T) T {
 func getPtrStructName(o any) string {
 	return reflect.TypeOf(o).Elem().Name()
 }
+
+func foreachSubComponent(component Component, f func(fieldComponent Component, filedIndex int, autowiredName string)) {
+	// 递归初始化instance依赖的Component（tag标记autowired:""）
+	// 遍历instance的字段，如果字段是Component类型，且tag标记autowired:""，则初始化
+	instanceValue := reflect.ValueOf(component).Elem()
+	instanceType := reflect.TypeOf(component).Elem()
+	for i := 0; i < instanceValue.NumField(); i++ {
+		var (
+			autowiredName  string
+			ok             bool
+			fieldComponent Component
+		)
+		// 获取属性的tag
+		if autowiredName, ok = instanceType.Field(i).Tag.Lookup("autowired"); !ok {
+			continue
+		}
+		filed := instanceValue.Field(i)
+		// 判断属性类型是否是指针或接口
+		if filed.Kind() != reflect.Ptr && filed.Kind() != reflect.Interface {
+			continue
+		}
+		// 判断属性类型是否是Component
+		if fieldComponent, ok = filed.Interface().(Component); !ok {
+			if autowiredName == "" {
+				continue
+			}
+			// 设置了autoWiredName，说明可能是接口类型，需要通过接口名获取Component
+		}
+		f(fieldComponent, i, autowiredName)
+	}
+}

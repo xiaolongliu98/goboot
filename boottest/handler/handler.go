@@ -9,7 +9,7 @@ import (
 type TestHandler struct {
 	Msg string
 
-	TestService1 *service.TestService1 `autowired:""`
+	TestService1 service.StringGetter  `autowired:"TestService1"`
 	TestService2 *service.TestService2 `autowired:""`
 }
 

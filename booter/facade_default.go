@@ -10,3 +10,7 @@ func GetInstance[T Component](component T) T {
 func GetInstanceByName[T Component](name string) T {
 	return defaultBootContext.GetInstanceByName(name).(T)
 }
+
+func CleanupAll() {
+	defaultBootContext.CleanupAll()
+}
